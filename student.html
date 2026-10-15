@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Studyroom – Student learning platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f2fb;--surface:#fff;--ink:#1f1b3a;--muted:#625e80;--line:#dcd8ee;--accent:#5b3df5;--accent-ink:#fff;--ok:#0f8f5f;--warn:#b86e00;--track:#e4e0f5;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12102a;--surface:#1c1a3a;--ink:#efedff;--muted:#a9a5cc;--line:#302d57;--accent:#9d8cff;--accent-ink:#12102a;--ok:#4fd6a0;--warn:#ffb84d;--track:#2c2950}}
+:root[data-theme="dark"]{--bg:#12102a;--surface:#1c1a3a;--ink:#efedff;--muted:#a9a5cc;--line:#302d57;--accent:#9d8cff;--accent-ink:#12102a;--ok:#4fd6a0;--warn:#ffb84d;--track:#2c2950}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Sora',system-ui,-apple-system,Segoe UI,sans-serif;line-height:1.55}
+button,input{font:inherit;color:inherit}button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.bar{max-width:1000px;margin:auto;padding:12px 20px;display:flex;align-items:center;gap:14px}
+.logo{font-weight:800;font-size:1.3rem;letter-spacing:-.03em;margin-right:auto;background:none;border:0;padding:0}
+.logo i{font-style:normal;color:var(--accent)}
+.xp{background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:5px 14px;font-weight:600;font-size:.9rem}
+main{max-width:1000px;margin:auto;padding:28px 20px 60px}
+h1{font-size:clamp(1.8rem,5vw,2.8rem);letter-spacing:-.03em;line-height:1.1;margin:0 0 6px}
+.sub{color:var(--muted);margin:0 0 24px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:30px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.stat b{display:block;font-size:1.7rem;letter-spacing:-.02em}
+.stat span{color:var(--muted);font-size:.85rem}
+h2{font-size:1.2rem;margin:0 0 14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.course{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:0;overflow:hidden;display:flex;flex-direction:column}
+.course .top{height:84px;display:grid;place-items:center;font-size:2.4rem}
+.course .b{padding:14px 16px 16px;display:grid;gap:6px}
+.course strong{font-size:1.05rem}
+.course small{color:var(--muted)}
+.bar2{height:8px;border-radius:99px;background:var(--track);overflow:hidden}
+.bar2 i{display:block;height:100%;background:var(--ok);border-radius:99px;transition:width .3s}
+.back{background:none;border:0;color:var(--accent);font-weight:600;padding:0;margin-bottom:14px}
+.layout{display:grid;grid-template-columns:260px 1fr;gap:22px;align-items:start}
+@media (max-width:760px){.layout{grid-template-columns:1fr}}
+.list{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:8px}
+.les{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:none;border:0;border-radius:10px;padding:10px}
+.les[aria-current="true"]{background:var(--track)}
+.dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);flex:none;display:grid;place-items:center;font-size:.75rem;color:var(--accent-ink)}
+.dot.on{background:var(--ok);border-color:var(--ok)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px}
+.panel h2{font-size:1.4rem}
+.panel p{max-width:62ch}
+.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:10px;padding:10px 18px;font-weight:600}
+.btn.ghost{background:var(--track);color:var(--ink)}
+.q{margin:0 0 18px;border:0;padding:0}
+.q legend{font-weight:600;margin-bottom:8px}
+.opt{display:flex;gap:8px;align-items:center;padding:8px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:6px}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 15%,transparent)}
+.opt.wrong{border-color:var(--warn);background:color-mix(in srgb,var(--warn) 15%,transparent)}
+.res{font-weight:800;font-size:1.1rem;margin:10px 0}
+.name{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 14px;margin-right:8px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,120px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;transition:transform .25s;z-index:20}
+.toast.on{transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header><div class="bar">
+  <button class="logo" id="home">Study<i>room</i></button>
+  <span class="xp" id="xp">0 XP</span>
+</div></header>
+<main id="app"></main>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const COURSES=[
+{id:'alg',name:'Algebra Basics',e:'➗',c:'#c9bfff',lessons:[
+ {t:'Variables and expressions',b:'A variable is a letter that stands for a number. In 3x + 2, x is the variable, 3 is the coefficient and 2 is a constant. Substituting a value for x gives a single number.'},
+ {t:'Solving linear equations',b:'To solve 2x + 6 = 14, do the same thing to both sides. Subtract 6 to get 2x = 8, then divide by 2 to get x = 4. Always check by putting x back into the original equation.'},
+ {t:'Graphing a line',b:'A line follows y = mx + b. The slope m tells you how steep it is, and b is where it crosses the y-axis. Plot b first, then use the slope to find the next point.'}],
+ quiz:[{q:'Solve: 3x = 12',o:['x = 3','x = 4','x = 9'],a:1},{q:'In y = 5x + 2, what is the slope?',o:['2','5','7'],a:1},{q:'What do you do to both sides of an equation?',o:['Nothing','The same operation','Add only'],a:1}]},
+{id:'py',name:'Intro to Python',e:'🐍',c:'#a9e7cf',lessons:[
+ {t:'Variables and types',b:'A variable stores a value, like age = 15. Common types are int (whole numbers), float (decimals), str (text) and bool (True or False).'},
+ {t:'Conditions',b:'An if statement runs code only when a condition is true. Use elif for extra checks and else for everything left over. Indentation shows which lines belong to the block.'},
+ {t:'Loops',b:'A for loop repeats code for each item in a sequence. for i in range(3) runs three times with i equal to 0, 1 and 2.'}],
+ quiz:[{q:'Which type is "hello"?',o:['int','str','bool'],a:1},{q:'How many times does range(3) loop?',o:['2','3','4'],a:1},{q:'Which keyword handles "everything else"?',o:['else','for','def'],a:0}]},
+{id:'his',name:'World History',e:'🏛️',c:'#ffd8a8',lessons:[
+ {t:'Early river civilizations',b:'The first cities grew beside rivers: the Nile, the Tigris and Euphrates, the Indus and the Yellow River. Fertile land allowed farming surpluses, which supported trade, writing and government.'},
+ {t:'Ancient Greece and Rome',b:'Greece introduced early democracy in Athens, while Rome grew from a city into a republic and then an empire. Roman roads, law and Latin shaped Europe for centuries.'},
+ {t:'The printing press',b:'Around 1450 Johannes Gutenberg built a printing press with movable type. Books became cheaper, literacy rose and ideas spread much faster across Europe.'}],
+ quiz:[{q:'Why did early cities form near rivers?',o:['Fertile land for farming','Cold weather','No neighbours'],a:0},{q:'Which city is linked to early democracy?',o:['Rome','Athens','Cairo'],a:1},{q:'Who built the movable-type press around 1450?',o:['Gutenberg','Caesar','Newton'],a:0}]},
+{id:'bio',name:'Biology: Cells',e:'🧬',c:'#ffc9d6',lessons:[
+ {t:'What is a cell?',b:'The cell is the basic unit of life. Some organisms, like bacteria, are a single cell. Others, like humans, are made of trillions working together.'},
+ {t:'Parts of a cell',b:'The nucleus holds DNA, mitochondria release energy, and the cell membrane controls what enters and leaves. Plant cells also have a cell wall and chloroplasts.'},
+ {t:'Photosynthesis',b:'Plants use chloroplasts to turn sunlight, water and carbon dioxide into glucose and oxygen. This gives the plant energy and gives us the oxygen we breathe.'}],
+ quiz:[{q:'Which part holds DNA?',o:['Membrane','Nucleus','Cell wall'],a:1},{q:'What do mitochondria do?',o:['Release energy','Make oxygen','Store water'],a:0},{q:'What gas do plants release in photosynthesis?',o:['Carbon dioxide','Nitrogen','Oxygen'],a:2}]}];
+
+let S={name:'',done:{},quiz:{}};
+try{S={...S,...JSON.parse(localStorage.getItem('studyroom')||'{}')}}catch(e){}
+const save=()=>{try{localStorage.setItem('studyroom',JSON.stringify(S))}catch(e){}};
+const $=s=>document.querySelector(s);
+const app=$('#app');
+const doneCount=c=>(S.done[c.id]||[]).length;
+const pct=c=>Math.round(doneCount(c)/c.lessons.length*100);
+const xp=()=>COURSES.reduce((a,c)=>a+doneCount(c)*10+(S.quiz[c.id]||0)*5,0);
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),1800)}
+function head(){$('#xp').textContent=xp()+' XP'}
+
+function home(){
+  const total=COURSES.reduce((a,c)=>a+c.lessons.length,0),done=COURSES.reduce((a,c)=>a+doneCount(c),0);
+  const quizzes=Object.keys(S.quiz).length;
+  const next=COURSES.find(c=>pct(c)<100);
+  app.innerHTML=`
+  <h1>${S.name?`Welcome back, ${S.name}`:'Welcome to Studyroom'}</h1>
+  <p class="sub">${next?`Pick up where you left off in ${next.name}.`:'You finished every course. Great work.'}</p>
+  ${S.name?'':`<form id="nf" style="margin-bottom:24px"><input class="name" id="ni" placeholder="Your first name" aria-label="Your first name" required><button class="btn">Save name</button></form>`}
+  <div class="stats">
+    <div class="stat"><b>${done}/${total}</b><span>Lessons completed</span></div>
+    <div class="stat"><b>${quizzes}/${COURSES.length}</b><span>Quizzes taken</span></div>
+    <div class="stat"><b>${xp()}</b><span>XP earned</span></div>
+  </div>
+  <h2>Your courses</h2>
+  <div class="grid">${COURSES.map(c=>`<button class="course" data-c="${c.id}"><div class="top" style="background:${c.c}" aria-hidden="true">${c.e}</div><div class="b"><strong>${c.name}</strong><small>${doneCount(c)} of ${c.lessons.length} lessons${S.quiz[c.id]!=null?` · quiz ${S.quiz[c.id]}/3`:''}</small><div class="bar2" role="progressbar" aria-valuenow="${pct(c)}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct(c)}%"></i></div></div></button>`).join('')}</div>`;
+  const nf=$('#nf');if(nf)nf.onsubmit=e=>{e.preventDefault();S.name=$('#ni').value.trim();save();home()};
+  app.querySelectorAll('.course').forEach(b=>b.onclick=()=>course(b.dataset.c,0));
+  head();
+}
+
+function course(id,i){
+  const c=COURSES.find(x=>x.id===id),d=S.done[id]||[];
+  const L=c.lessons[i],isDone=d.includes(i);
+  app.innerHTML=`
+  <button class="back" id="bk">← All courses</button>
+  <h1>${c.name}</h1>
+  <p class="sub">${pct(c)}% complete</p>
+  <div class="layout">
+    <nav class="list" aria-label="Lessons">
+      ${c.lessons.map((l,n)=>`<button class="les" data-i="${n}" aria-current="${n===i}"><span class="dot ${d.includes(n)?'on':''}">${d.includes(n)?'✓':''}</span>${l.t}</button>`).join('')}
+      <button class="les" data-q="1" aria-current="${i==='quiz'}"><span class="dot ${S.quiz[id]!=null?'on':''}">${S.quiz[id]!=null?'✓':''}</span>Quiz</button>
+    </nav>
+    <section class="panel" id="pn"></section>
+  </div>`;
+  $('#bk').onclick=home;
+  app.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>course(id,+b.dataset.i));
+  app.querySelector('[data-q]').onclick=()=>course(id,'quiz');
+  const pn=$('#pn');
+  if(i==='quiz'){quiz(c,pn);head();return}
+  pn.innerHTML=`<h2>${L.t}</h2><p>${L.b}</p>
+    <button class="btn ${isDone?'ghost':''}" id="mk">${isDone?'Completed – undo':'Mark as complete'}</button>`;
+  $('#mk').onclick=()=>{
+    if(isDone)S.done[id]=d.filter(x=>x!==i);
+    else{S.done[id]=[...d,i];toast('Lesson complete: +10 XP')}
+    save();
+    course(id,!isDone&&i<c.lessons.length-1?i+1:(!isDone?'quiz':i));
+  };
+  head();
+}
+
+function quiz(c,pn){
+  const prev=S.quiz[c.id];
+  pn.innerHTML=`<h2>${c.name} quiz</h2>${prev!=null?`<p>Your best score so far: ${prev}/3. Retake it any time.</p>`:'<p>Answer all three questions, then check your score.</p>'}
+  <form id="qf">${c.quiz.map((q,n)=>`<fieldset class="q"><legend>${n+1}. ${q.q}</legend>${q.o.map((o,k)=>`<label class="opt" data-n="${n}" data-k="${k}"><input type="radio" name="q${n}" value="${k}" required> ${o}</label>`).join('')}</fieldset>`).join('')}
+  <button class="btn">Check answers</button><div id="r"></div></form>`;
+  $('#qf').onsubmit=e=>{
+    e.preventDefault();
+    let s=0;
+    c.quiz.forEach((q,n)=>{
+      const v=+new FormData(e.target).get('q'+n);
+      if(v===q.a)s++;
+      pn.querySelectorAll(`[data-n="${n}"]`).forEach(l=>{
+        const k=+l.dataset.k;l.classList.remove('right','wrong');
+        if(k===q.a)l.classList.add('right');else if(k===v)l.classList.add('wrong');
+      });
+    });
+    if(prev==null||s>prev){S.quiz[c.id]=s;save();head()}
+    $('#r').innerHTML=`<p class="res">You scored ${s}/3. ${s===3?'Perfect.':s>=2?'Nice work.':'Review the lessons and try again.'}</p>`;
+    toast('Quiz saved');
+  };
+}
+
+$('#home').onclick=home;
+home();
+</script>
+<!-- </body> -->
+</html>
