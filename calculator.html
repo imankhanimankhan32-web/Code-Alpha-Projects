@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>calc · modern calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+  <style>
+    /* ---------- GLOBAL RESET & BASE ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, #f0f2f8 0%, #e6e9f2 100%);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      padding: 1.5rem;
+    }
+
+    /* ---------- CALCULATOR SHELL ---------- */
+    .calculator {
+      width: 100%;
+      max-width: 380px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 42px;
+      padding: 1.8rem 1.5rem 2rem;
+      box-shadow:
+        0 30px 60px -20px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(255, 255, 255, 0.7),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+      transition: box-shadow 0.3s ease;
+    }
+
+    .calculator:hover {
+      box-shadow:
+        0 40px 70px -22px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.8),
+        inset 0 0 0 1px rgba(255, 255, 255, 1);
+    }
+
+    /* ---------- DISPLAY SCREEN ---------- */
+    .display {
+      background: #1c1c2a;
+      border-radius: 28px;
+      padding: 1.5rem 1.5rem 1.3rem;
+      margin-bottom: 1.8rem;
+      box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(255, 255, 255, 0.5);
+      text-align: right;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .display-history {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.4);
+      min-height: 1.4rem;
+      letter-spacing: 0.5px;
+      font-weight: 400;
+      word-break: break-all;
+      margin-bottom: 0.3rem;
+    }
+
+    .display-current {
+      font-size: 3rem;
+      font-weight: 600;
+      color: #ffffff;
+      line-height: 1.2;
+      word-break: break-all;
+      letter-spacing: -0.02em;
+      transition: all 0.15s ease;
+    }
+
+    /* ---------- BUTTON GRID ---------- */
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.85rem;
+    }
+
+    .btn {
+      border: none;
+      outline: none;
+      font-family: inherit;
+      font-size: 1.45rem;
+      font-weight: 500;
+      padding: 1.1rem 0.5rem;
+      border-radius: 24px;
+      background: #ffffff;
+      color: #1c1c2a;
+      cursor: pointer;
+      box-shadow: 0 6px 12px -6px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.02);
+      transition: transform 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.1),
+                  box-shadow 0.25s ease,
+                  background 0.2s ease,
+                  color 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn:hover {
+      background: #f8f9fe;
+      box-shadow: 0 12px 18px -8px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.02);
+      transform: translateY(-2px);
+    }
+
+    .btn:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: 0 4px 8px -4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* operator buttons */
+    .btn-operator {
+      background: #e8eaf2;
+      color: #1c1c2a;
+      font-weight: 600;
+    }
+
+    .btn-operator:hover {
+      background: #dde0ec;
+    }
+
+    /* equals button */
+    .btn-equals {
+      background: #1c1c2a;
+      color: white;
+      font-weight: 600;
+      box-shadow: 0 10px 18px -8px rgba(28, 28, 42, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-equals:hover {
+      background: #2a2a40;
+      box-shadow: 0 14px 22px -8px rgba(28, 28, 42, 0.6);
+    }
+
+    /* clear button */
+    .btn-clear {
+      background: #fff0f0;
+      color: #c42b2b;
+      font-weight: 600;
+    }
+
+    .btn-clear:hover {
+      background: #ffe4e4;
+    }
+
+    /* zero button (spans 2 columns) */
+    .btn-zero {
+      grid-column: span 2;
+    }
+
+    /* responsive adjustments */
+    @media (max-width: 420px) {
+      .calculator {
+        padding: 1.2rem 1rem 1.5rem;
+        border-radius: 32px;
+      }
+
+      .display {
+        padding: 1.2rem 1rem 1rem;
+        border-radius: 22px;
+      }
+
+      .display-current {
+        font-size: 2.4rem;
+      }
+
+      .buttons {
+        gap: 0.6rem;
+      }
+
+      .btn {
+        font-size: 1.2rem;
+        padding: 0.9rem 0.3rem;
+        border-radius: 18px;
+      }
+    }
+
+    @media (max-width: 340px) {
+      .display-current {
+        font-size: 2rem;
+      }
+
+      .btn {
+        font-size: 1rem;
+        padding: 0.7rem 0.2rem;
+        border-radius: 16px;
+      }
+    }
+
+    /* small visual cue for keyboard users */
+    .btn:focus-visible {
+      outline: 3px solid #3a6df0;
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <!-- DISPLAY SCREEN -->
+    <div class="display">
+      <div class="display-history" id="history"></div>
+      <div class="display-current" id="current">0</div>
+    </div>
+
+    <!-- BUTTONS GRID -->
+    <div class="buttons">
+      <!-- row 1 -->
+      <button class="btn btn-clear" id="clear">AC</button>
+      <button class="btn btn-operator" id="backspace">⌫</button>
+      <button class="btn btn-operator" id="percent">%</button>
+      <button class="btn btn-operator" id="divide">÷</button>
+
+      <!-- row 2 -->
+      <button class="btn" id="num7">7</button>
+      <button class="btn" id="num8">8</button>
+      <button class="btn" id="num9">9</button>
+      <button class="btn btn-operator" id="multiply">×</button>
+
+      <!-- row 3 -->
+      <button class="btn" id="num4">4</button>
+      <button class="btn" id="num5">5</button>
+      <button class="btn" id="num6">6</button>
+      <button class="btn btn-operator" id="subtract">−</button>
+
+      <!-- row 4 -->
+      <button class="btn" id="num1">1</button>
+      <button class="btn" id="num2">2</button>
+      <button class="btn" id="num3">3</button>
+      <button class="btn btn-operator" id="add">+</button>
+
+      <!-- row 5 -->
+      <button class="btn btn-zero" id="num0">0</button>
+      <button class="btn" id="decimal">.</button>
+      <button class="btn btn-equals" id="equals">=</button>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // ---------- STATE ----------
+      let currentInput = '0';          // the number string being entered
+      let previousValue = null;        // number (first operand)
+      let operator = null;            // '+', '-', '*', '/'
+      let waitingForOperand = false;  // if true, next digit replaces currentInput
+      let historyText = '';           // display history
+
+      // DOM elements
+      const currentDisplay = document.getElementById('current');
+      const historyDisplay = document.getElementById('history');
+
+      // ---------- UTILITY FUNCTIONS ----------
+      // Update the display based on state
+      function updateDisplay() {
+        // if currentInput is too long, we could format, but keep simple
+        currentDisplay.textContent = currentInput;
+        historyDisplay.textContent = historyText;
+      }
+
+      // Clear all state (AC)
+      function clearAll() {
+        currentInput = '0';
+        previousValue = null;
+        operator = null;
+        waitingForOperand = false;
+        historyText = '';
+        updateDisplay();
+      }
+
+      // Delete last character (backspace)
+      function backspace() {
+        // If we are waiting for operand, or currentInput is '0', reset to '0'
+        if (waitingForOperand) {
+          // If waiting, backspace does nothing to currentInput (or we can reset)
+          // Usually backspace clears the current number; we'll set to '0'
+          currentInput = '0';
+          waitingForOperand = false;
+        } else {
+          // Remove last character
+          if (currentInput.length === 1 || currentInput === '0') {
+            currentInput = '0';
+          } else {
+            currentInput = currentInput.slice(0, -1);
+            if (currentInput === '' || currentInput === '-') currentInput = '0';
+          }
+        }
+        // also clear history if we are editing? keep as is
+        updateDisplay();
+      }
+
+      // Append a digit to currentInput
+      function inputDigit(digit) {
+        if (waitingForOperand) {
+          // replace current input with the new digit
+          currentInput = digit;
+          waitingForOperand = false;
+        } else {
+          // if currentInput is '0', replace it, otherwise append
+          if (currentInput === '0') {
+            currentInput = digit;
+          } else {
+            currentInput += digit;
+          }
+        }
+        updateDisplay();
+      }
+
+      // Append decimal point
+      function inputDecimal() {
+        if (waitingForOperand) {
+          currentInput = '0.';
+          waitingForOperand = false;
+        } else {
+          // add decimal only if not already present
+          if (!currentInput.includes('.')) {
+            currentInput += '.';
+          }
+        }
+        updateDisplay();
+      }
+
+      // Handle operator input (+, -, *, /)
+      function handleOperator(nextOperator) {
+        const inputValue = parseFloat(currentInput);
+
+        // If there is already an operator and we are not waiting for operand,
+        // compute the result first (chaining)
+        if (operator && !waitingForOperand && previousValue !== null) {
+          const result = compute(previousValue, inputValue, operator);
+          if (result === null) return; // error handled inside
+          previousValue = result;
+          currentInput = String(result);
+          // update display immediately
+          currentDisplay.textContent = currentInput;
+        } else {
+          // No operator yet or waiting for operand: set previousValue to current
+          previousValue = inputValue;
+        }
+
+        // Set waiting for operand, store operator
+        waitingForOperand = true;
+        operator = nextOperator;
+
+        // Update history line: previousValue + operator
+        // Use symbols for display
+        const opSymbol = { '+': '+', '-': '−', '*': '×', '/': '÷' }[nextOperator] || nextOperator;
+        historyText = `${previousValue} ${opSymbol}`;
+        updateDisplay();
+      }
+
+      // Compute result based on operator
+      function compute(a, b, op) {
+        let result = 0;
+        switch (op) {
+          case '+': result = a + b; break;
+          case '-': result = a - b; break;
+          case '*': result = a * b; break;
+          case '/':
+            if (b === 0) {
+              // handle division by zero
+              currentInput = 'Error';
+              historyText = '';
+              previousValue = null;
+              operator = null;
+              waitingForOperand = false;
+              updateDisplay();
+              return null;
+            }
+            result = a / b;
+            break;
+          default: return null;
+        }
+        // Round to avoid floating point issues (keep up to 10 decimals)
+        return Math.round(result * 1e10) / 1e10;
+      }
+
+      // Handle equals
+      function handleEquals() {
+        if (!operator || previousValue === null) {
+          // nothing to compute
+          return;
+        }
+
+        const inputValue = parseFloat(currentInput);
+        const result = compute(previousValue, inputValue, operator);
+        if (result === null) return; // error already shown
+
+        // Update history to show full expression
+        const opSymbol = { '+': '+', '-': '−', '*': '×', '/': '÷' }[operator] || operator;
+        historyText = `${previousValue} ${opSymbol} ${inputValue} =`;
+
+        // Set currentInput to result
+        currentInput = String(result);
+        // reset operator and previousValue
+        previousValue = null;
+        operator = null;
+        waitingForOperand = false;
+        updateDisplay();
+      }
+
+      // Handle percent (simple: convert current to percentage of 1? typical calculator: divide by 100)
+      function handlePercent() {
+        const value = parseFloat(currentInput);
+        if (isNaN(value)) return;
+        const percentValue = value / 100;
+        currentInput = String(percentValue);
+        updateDisplay();
+      }
+
+      // ---------- EVENT LISTENERS (BUTTONS) ----------
+      document.getElementById('clear').addEventListener('click', clearAll);
+      document.getElementById('backspace').addEventListener('click', backspace);
+      document.getElementById('percent').addEventListener('click', handlePercent);
+      
+      document.getElementById('num0').addEventListener('click', () => inputDigit('0'));
+      document.getElementById('num1').addEventListener('click', () => inputDigit('1'));
+      document.getElementById('num2').addEventListener('click', () => inputDigit('2'));
+      document.getElementById('num3').addEventListener('click', () => inputDigit('3'));
+      document.getElementById('num4').addEventListener('click', () => inputDigit('4'));
+      document.getElementById('num5').addEventListener('click', () => inputDigit('5'));
+      document.getElementById('num6').addEventListener('click', () => inputDigit('6'));
+      document.getElementById('num7').addEventListener('click', () => inputDigit('7'));
+      document.getElementById('num8').addEventListener('click', () => inputDigit('8'));
+      document.getElementById('num9').addEventListener('click', () => inputDigit('9'));
+      document.getElementById('decimal').addEventListener('click', inputDecimal);
+
+      document.getElementById('add').addEventListener('click', () => handleOperator('+'));
+      document.getElementById('subtract').addEventListener('click', () => handleOperator('-'));
+      document.getElementById('multiply').addEventListener('click', () => handleOperator('*'));
+      document.getElementById('divide').addEventListener('click', () => handleOperator('/'));
+      document.getElementById('equals').addEventListener('click', handleEquals);
+
+      // ---------- KEYBOARD SUPPORT (BONUS) ----------
+      window.addEventListener('keydown', (e) => {
+        const key = e.key;
+
+        // Prevent default for keys that might scroll (space, etc.) or trigger browser shortcuts
+        if (key === ' ' || key === 'Enter' || key === '=') {
+          e.preventDefault();
+        }
+
+        // Numbers 0-9
+        if (/^[0-9]$/.test(key)) {
+          e.preventDefault();
+          inputDigit(key);
+          return;
+        }
+
+        // Decimal point
+        if (key === '.' || key === ',') {
+          e.preventDefault();
+          inputDecimal();
+          return;
+        }
+
+        // Operators
+        if (key === '+') {
+          e.preventDefault();
+          handleOperator('+');
+          return;
+        }
+        if (key === '-') {
+          e.preventDefault();
+          handleOperator('-');
+          return;
+        }
+        if (key === '*' || key === 'x' || key === 'X') {
+          e.preventDefault();
+          handleOperator('*');
+          return;
+        }
+        if (key === '/') {
+          e.preventDefault();
+          handleOperator('/');
+          return;
+        }
+
+        // Equals (Enter or =)
+        if (key === 'Enter' || key === '=') {
+          e.preventDefault();
+          handleEquals();
+          return;
+        }
+
+        // Backspace
+        if (key === 'Backspace') {
+          e.preventDefault();
+          backspace();
+          return;
+        }
+
+        // Escape for clear
+        if (key === 'Escape') {
+          e.preventDefault();
+          clearAll();
+          return;
+        }
+
+        // Percent
+        if (key === '%') {
+          e.preventDefault();
+          handlePercent();
+          return;
+        }
+      });
+
+      // ---------- INITIAL DISPLAY ----------
+      updateDisplay();
+
+      // small fix: clear history when starting new number after equals? 
+      // we can handle by resetting history when a digit is entered after equals
+      // Actually handle in inputDigit: if waitingForOperand is false and previousValue was null? 
+      // Let's add a reset for history when starting fresh after equals/clear.
+      // We'll override inputDigit slightly to clear history if we are starting a new number.
+      const originalInputDigit = inputDigit;
+      inputDigit = function(digit) {
+        // If we are not waiting for operand, but previousValue is null and operator is null, and currentInput is '0'? 
+        // Actually if operator is null and previousValue is null, we are at start.
+        if (operator === null && previousValue === null && !waitingForOperand && currentInput === '0' && historyText !== '') {
+          historyText = '';  // clear history when starting a fresh number
+        }
+        // also if we just pressed equals, operator is null, previousValue null, waitingForOperand false,
+        // and historyText includes '=' -> clear it
+        if (historyText.includes('=')) {
+          historyText = '';
+        }
+        originalInputDigit(digit);
+      };
+
+      // Override decimal similarly
+      const originalInputDecimal = inputDecimal;
+      inputDecimal = function() {
+        if (historyText.includes('=')) {
+          historyText = '';
+        }
+        originalInputDecimal();
+      };
+
+      // Also clear history on operator if needed? handled inside handleOperator.
+      // But we need to reassign the event listeners to use the new functions? 
+      // Since the functions are called by name in the event listeners? We used anonymous arrow functions.
+      // That means the overrides won't take effect because the original functions are bound.
+      // So better to restructure: we can reassign the event listeners or just handle history clear inside the original functions.
+      // Quick fix: I'll update the original functions with the history clearing logic instead of overriding.
+      // But we've already defined them. Let's patch the original functions by adding the logic inside them.
+      // I'll do a small refactor: edit the functions directly (in a real scenario, rewrite). 
+      // Since this is a demo, I'll just add a helper to clear history when appropriate.
+      
+      // Instead of override, let's add a wrapper by re-assigning the event listeners? That's messy.
+      // I'll just modify the original functions using a quick patch: 
+      // (I'll edit the script below via a small hack: redefine with new functions and reassign event listeners)
+      
+      // Better: reload with the correct functions. I'll just replace the event listeners with new ones that call the updated logic.
+      // Actually, let's keep it clean: I'll rewrite the core functions properly in a final version.
+
+      // To keep the code reliable, I'll rewrite the inputDigit and inputDecimal functions and reattach listeners.
+
+      // --- FINAL CLEAN VERSION OF FUNCTIONS WITH HISTORY RESET ---
+      // We'll redefine the functions and reassign event listeners to be safe.
+
+      // Remove all previous listeners by cloning? Instead, redefine functions and reassign listeners.
+      // We'll just overwrite the functions and then reassign event listeners for buttons.
+      
+      // Redefine inputDigit and inputDecimal with history reset
+      inputDigit = function(digit) {
+        // Clear history if we're starting a new calculation (after equals or clear)
+        if (historyText.includes('=') || (operator === null && previousValue === null && !waitingForOperand && currentInput === '0' && historyText !== '')) {
+          historyText = '';
+        }
+        if (waitingForOperand) {
+          currentInput = digit;
+          waitingForOperand = false;
+        } else {
+          if (currentInput === '0') {
+            currentInput = digit;
+          } else {
+            currentInput += digit;
+          }
+        }
+        updateDisplay();
+      };
+
+      inputDecimal = function() {
+        if (historyText.includes('=') || (operator === null && previousValue === null && !waitingForOperand && currentInput === '0' && historyText !== '')) {
+          historyText = '';
+        }
+        if (waitingForOperand) {
+          currentInput = '0.';
+          waitingForOperand = false;
+        } else {
+          if (!currentInput.includes('.')) {
+            currentInput += '.';
+          }
+        }
+        updateDisplay();
+      };
+
+      // Reassign event listeners for number buttons and decimal to use updated functions
+      // (Since we already assigned with arrow functions, we need to remove and re-add)
+      // Simpler: just override the event listeners by reassigning .onclick? Let's do that.
+      // Using onclick to simplify reassignment.
+      document.getElementById('num0').onclick = () => inputDigit('0');
+      document.getElementById('num1').onclick = () => inputDigit('1');
+      document.getElementById('num2').onclick = () => inputDigit('2');
+      document.getElementById('num3').onclick = () => inputDigit('3');
+      document.getElementById('num4').onclick = () => inputDigit('4');
+      document.getElementById('num5').onclick = () => inputDigit('5');
+      document.getElementById('num6').onclick = () => inputDigit('6');
+      document.getElementById('num7').onclick = () => inputDigit('7');
+      document.getElementById('num8').onclick = () => inputDigit('8');
+      document.getElementById('num9').onclick = () => inputDigit('9');
+      document.getElementById('decimal').onclick = inputDecimal;
+
+      // Also reassign keyboard handler to use the updated functions (it references inputDigit directly in closure, so it will use new version)
+      // The keyboard listener is fine because it calls inputDigit which is now the new function.
+
+      // Clear history also when operator is pressed if it has '='
+      const originalHandleOperator = handleOperator;
+      handleOperator = function(nextOperator) {
+        if (historyText.includes('=')) {
+          historyText = '';
+        }
+        originalHandleOperator(nextOperator);
+      };
+      // reassign operator buttons
+      document.getElementById('add').onclick = () => handleOperator('+');
+      document.getElementById('subtract').onclick = () => handleOperator('-');
+      document.getElementById('multiply').onclick = () => handleOperator('*');
+      document.getElementById('divide').onclick = () => handleOperator('/');
+
+      // equals handler also should not clear history incorrectly, but it's fine.
+      // handleEquals already sets history to expression.
+      
+      // Ensure clearAll resets everything
+      // already good.
+
+      // Final initialization
+      clearAll();  // start fresh
+
+    })();
+  </script>
+</body>
+</html>
